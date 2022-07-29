@@ -28,9 +28,7 @@ class KalimatiMarket:
 
         self.req = requests.get(self.website_url, headers=self.headers)
         
-        # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:
-        # opt = Options()
-        
+        # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:  
         CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
         GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN', '/usr/bin/google-chrome')
         opt = Options()
@@ -42,7 +40,9 @@ class KalimatiMarket:
             opt.add_argument(arg)
         opt.add_experimental_option('excludeSwitches', ['enable-logging'])
             
-        self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=opt)       
+        self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=opt)
+        # path = Service("c:\\users\\chromedriver.exe")       
+        # self.driver = webdriver.Chrome(service=path, options=opt)       
                 
     
     def status_code(self):
@@ -76,7 +76,8 @@ class KalimatiMarket:
         soup = BeautifulSoup(content, 'lxml')
         commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
         # The below method is List comprehension method from Python. It save lots of lines of code. Ideally you can use conventional 'for' loop and store the value in lists.
-        market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
+        # market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
+        market_lists = [[tab.find_all('td')[0].text.strip() for tab in commodity_table] for i in range(0, 5)]
         # Below lists will store all the scraped datas in tuple for databases:
         lists_of_markets = list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3], market_lists[4]))
         
