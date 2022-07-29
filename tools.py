@@ -30,10 +30,10 @@ class KalimatiMarket:
         
         # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:
         # opt = Options()
-        opt = Options() 
+        opt = Options()
+        self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=opt)
         opt.add_argument('--headless')
         opt.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         # path = Service("c:\\users\\chromedriver.exe")
         arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
               '--disable-dev-shm-usage']
