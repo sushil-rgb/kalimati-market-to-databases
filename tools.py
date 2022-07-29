@@ -63,7 +63,8 @@ class KalimatiMarket:
             except IndexError:
                 print("No data available! Try again tomorrow.")
                 market_lists = ["No data available! Try again tomorrow."] * 5
-
+            
+            lists_of_market = list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3], market_lists[4]))
             browser.close()
-            return market_lists
+            return lists_of_market
 
