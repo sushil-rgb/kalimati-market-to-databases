@@ -29,21 +29,17 @@ class KalimatiMarket:
         self.req = requests.get(self.website_url, headers=self.headers)
         
         # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:
-        # opt = Options()
-        chrome_options = webdriver.ChromeOptions()         
-        chrome_options.add_argument('--headless')
-        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-        # path = Service("c:\\users\\chromedriver.exe")
-        # arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
-        #      '--disable-dev-shm-usage']
-        # opt.headless = True
-        # opt.add_experimental_option('excludeSwitches', ['enable-logging'])
+        opt = Options()        
+        path = Service("c:\\users\\chromedriver.exe")
+        arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
+              '--disable-dev-shm-usage']
+        opt.headless = True
+        opt.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-        # for arg in arguments:
-        #     opt.add_argument(arg)
-# 
-        # self.driver = webdriver.Chrome(service=path, options=opt)        
+        for arg in arguments:
+             opt.add_argument(arg)
+ 
+        self.driver = webdriver.Chrome(service=path, options=opt)        
         
     
     def status_code(self):
@@ -75,9 +71,11 @@ class KalimatiMarket:
         
         content = self.driver.page_source
         soup = BeautifulSoup(content, 'lxml')
+        
         commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
         # The below method is List comprehension method from Python. It save lots of lines of code. Ideally you can use conventional 'for' loop and store the value in lists.
         market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
+        
         # Below lists will store all the scraped datas in tuple for databases:
         lists_of_markets = list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3], market_lists[4]))
         
