@@ -27,7 +27,7 @@ class KalimatiMarket:
 
         self.req = requests.get(self.website_url, headers=self.headers)
         
-        # Setting up the selenium driver. The Kalimati website is heavily rendere with Javascripts so browser automation is the way:
+        # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:
         opt = Options()
         path = Service("c:\\users\\chromedriver.exe")
         arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
@@ -38,8 +38,7 @@ class KalimatiMarket:
         for arg in arguments:
             opt.add_argument(arg)
 
-        self.driver = webdriver.Chrome(service=path, options=opt)
-        # driver.find_elements(By.TAG_NAME)
+        self.driver = webdriver.Chrome(service=path, options=opt)        
         
     
     def status_code(self):
@@ -58,7 +57,6 @@ class KalimatiMarket:
         date = soup.find('h4', class_='bottom-head').text.strip().replace("""दैनिक मूल्य बारे जानकारी
 - वि.सं. """, "")
         return date
-
 
 
     def scrape(self):       
@@ -81,4 +79,3 @@ class KalimatiMarket:
         return lists_of_markets
 
        
-        
