@@ -1,77 +1,29 @@
-from fastapi import FastAPI
-from fastapi.exceptions import HTTPException
-from tools import KalimatiMarket
+from tools import UserAgent, KalimatiMarket
+import time
+import sqlite3
 
 
-app = FastAPI()
-date = KalimatiMarket().daily_date()
-kalimati = KalimatiMarket().scrape()
+print(f"-------------------------------------------------------\nWelcome to Kalimati market data scraper | The scraper is powered by Playwright.")
 
+kalimati_market = KalimatiMarket()
 
-@app.get("/")
-def main_page():
-    return {'api-endpoints':[
-                            "/kalimati_market",                            
-                            "/kalimati_market/commodity",
-                            "/kalimati_market/unit",
-                            "/kalimati_market/minimum",
-                            "/kalimati_market/maximum",
-                            "/kalimati_market/average",
-                            
-        ]
-        }
+today_date = kalimati_market.daily_date()
+daily_date = today_date.replace(",", "").split() # here we first replace the comma and split it to give a table name
+table_name = '_'.join(daily_date)
 
+# Make sqlite3 connection:
+conn = sqlite3.connect("Kmarket daily database.db")
+curr = conn.cursor()
 
-@app.get("/kalimati_market")
-def market_today():
-    try:
-        return {date: {
-            "वस्तु": kalimati[0],
-            "एकाइ": kalimati[1],
-            "न्यूनतम": kalimati[2],
-            "अधिकतम": kalimati[3],
-            "औसत": kalimati[4]
+try:    
+    curr.execute(f"CREATE TABLE IF NOT EXISTS {table_name}(कृषि_उपज TEXT, ईकाइ TEXT, न्यूनतम TEXT, अधिकतम TEXT, औसत TEXT)")
 
-        }
-        
-    
-    }
-    except IndexError:
-        return "No data available try again tomorrow!"
+    curr.executemany(f"INSERT INTO {table_name} VALUES(?, ?, ?, ?, ?)", kalimati_market.scrape())
+    conn.commit()
+    conn.close()
+    print(f"Today's date: {today_date}")
+    time.sleep(2)
 
-
-@app.get("/kalimati_market/commodity")
-def commodity():
-    return {date:{
-            "वस्तु": kalimati[0]}}
-         
-        
-
-
-@app.get("/kalimati_market/unit")
-def unit():
-    return {date:{
-            "एकाइ": kalimati[1]}}     
-        
-
-
-@app.get("/kalimati_market/minimum")
-def minimum():
-    return {date:{
-            "न्यूनतम": kalimati[2]}}    
-        
-
-
-@app.get("/kalimati_market/maximum")
-def maximum():
-    return {date:{
-            "अधिकतम": kalimati[3]}}    
-        
-
-
-@app.get("/kalimati_market/average")
-def average():
-    return {date:{
-            "औसत": kalimati[4]}}
-    
-        
+    print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------")
+except sqlite3.OperationalError:
+    print(f"No data available. Please try again tomorrow.")

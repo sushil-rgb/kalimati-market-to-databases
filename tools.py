@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from bs4 import BeautifulSoup
 import requests
 import random
@@ -12,6 +13,8 @@ import os
 import itertools
 import time
 import sys
+import asyncio
+
 
 class UserAgent:
     def get(self):
@@ -22,27 +25,9 @@ class UserAgent:
 
 
 class KalimatiMarket:
-    def __init__(self):
-        self.headers = {"User-Agent": UserAgent().get()}
-        self.website_url = "https://kalimatimarket.gov.np/price"
-
-        self.req = requests.get(self.website_url, headers=self.headers)
-        
-        # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:  
-        CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
-        GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN', '/usr/bin/google-chrome')
-        opt = Options()
-        opt.binary_location = GOOGLE_CHROME_BIN 
-        arguments = ['--headless', '--disable-gpu', '--no-sandbox', 'start-maximized', "--disable-dev-sh-usage", "disable-infobars", "--disable-extensions","--disable-gpu",
-        '--disable-dev-shm-usage']      
-        
-        for arg in arguments:
-            opt.add_argument(arg)
-        opt.add_experimental_option('excludeSwitches', ['enable-logging'])
-            
-        self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=opt)
-        # path = Service("c:\\users\\chromedriver.exe")       
-        # self.driver = webdriver.Chrome(service=path, options=opt)       
+    def __init__(self):        
+        self.website_url = "https://kalimatimarket.gov.np/price" 
+        self.req = requests.get(self.website_url, headers={"User-Agent": UserAgent().get()})         
                 
     
     def status_code(self):
@@ -50,42 +35,45 @@ class KalimatiMarket:
     
 
     def daily_date(self):
-        self.driver.get(self.website_url)
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, slow_mo=1*10000)
+            page = browser.new_page(user_agent=UserAgent().get())            
+            page.goto(self.website_url)
         
-        date_xpath_selector = "//h4[@class='bottom-head']"
-        WebDriverWait(self.driver, 10).until((EC.presence_of_element_located((By.XPATH, date_xpath_selector))))
+            date_xpath_selector = "//h4[@class='bottom-head']"
 
-        content = self.driver.page_source
-        soup = BeautifulSoup(content, 'lxml')
-        
-        date = soup.find('h4', class_='bottom-head').text.strip().replace("""दैनिक मूल्य बारे जानकारी
-                                                                          - वि.सं. """, "")
-        return date
+            page.wait_for_selector(date_xpath_selector, timeout=1*10000)
 
+            content = page.content()
+            soup = BeautifulSoup(content, 'lxml')
 
-    def scrape(self):       
-        self.driver.get(self.website_url)
-        print(f"Scraping.")
-        time.sleep(2)
+            date = soup.find('h4', class_='bottom-head').text.strip().replace("""दैनिक मूल्य बारे जानकारी
+                                                                              - वि.सं. """, "")
+            return date
 
-        # Xpath selector:
-        table_xpath = "//table[@id='commodityPriceParticular']"
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, table_xpath)))
-        
-        content = self.driver.page_source
-        soup = BeautifulSoup(content, 'lxml')
-        commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
-        
-        # The below method is List comprehension method from Python. It save lots of lines of code. Ideally you can use conventional 'for' loop and store the value in lists.
-        try:
-            market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
-        except IndexError:
-            print("No data available try again tomorrow!")
-            market_lists = ["No data available! Try again tomorrow"] * 5
+    
+    def scrape(self):            
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, slow_mo=1*10000)
+            page = browser.new_page(user_agent=UserAgent().get())
+            print("Scraping.")
+            page.goto(self.website_url)
             
-        # Below lists will store all the scraped datas in tuple for databases:
-        lists_of_markets = list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3], market_lists[4]))
-        
-        return market_lists
+            # Xpath selector:
+            table_xpath = "//table[@id='commodityPriceParticular']"
+            page.wait_for_selector(table_xpath, timeout=1*10000)
 
+            content = page.content()
+            soup = BeautifulSoup(content, 'lxml')
+
+            commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
+            
+            try:
+                market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
+            except IndexError:
+                print("No data available! Try again tomorrow.")
+                market_lists = ["No data available! Try again tomorrow."] * 5
+
+            browser.close()
+            return market_lists
 
