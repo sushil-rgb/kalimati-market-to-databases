@@ -71,7 +71,7 @@ class KalimatiMarket:
         content = self.driver.page_source
         soup = BeautifulSoup(content, 'lxml')
         commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
-        # The below method is List comprehension from Python. It save lots of lines of code. Ideally you can use convension for loop and store the value in lists.
+        # The below method is List comprehension method from Python. It save lots of lines of code. Ideally you can use conventional 'for' loop and store the value in lists.
         market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
         # Below lists will store all the scraped datas in tuple for databases:
         lists_of_markets = list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3], market_lists[4]))
