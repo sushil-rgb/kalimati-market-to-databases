@@ -16,7 +16,7 @@ def main_page():
                             "/kalimati_market/unit",
                             "/kalimati_market/minimum",
                             "/kalimati_market/maximum",
-                            "/kalimati_market/average",
+                            # # # "/kalimati_market/average",
                             
         ]
         }
