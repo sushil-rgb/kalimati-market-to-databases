@@ -17,13 +17,13 @@ curr = conn.cursor()
 
 try:    
     curr.execute(f"CREATE TABLE IF NOT EXISTS {table_name}(कृषि_उपज TEXT, ईकाइ TEXT, न्यूनतम TEXT, अधिकतम TEXT, औसत TEXT)")
-
     curr.executemany(f"INSERT INTO {table_name} VALUES(?, ?, ?, ?, ?)", kalimati_market.scrape())
     conn.commit()
     conn.close()
     print(f"Today's date: {today_date}")
     time.sleep(2)
-
     print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------")
 except sqlite3.OperationalError:
     print(f"No data available. Please try again tomorrow.")
+
+    

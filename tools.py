@@ -1,19 +1,9 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from bs4 import BeautifulSoup
 import requests
 import random
-import os
 import itertools
 import time
-import sys
-import asyncio
 
 
 class UserAgent:
@@ -41,14 +31,14 @@ class KalimatiMarket:
             page.goto(self.website_url)
         
             date_xpath_selector = "//h4[@class='bottom-head']"
-
             page.wait_for_selector(date_xpath_selector, timeout=1*10000)
 
             content = page.content()
             soup = BeautifulSoup(content, 'lxml')
-
             date = soup.find('h4', class_='bottom-head').text.strip().replace("""दैनिक मूल्य बारे जानकारी
                                                                               - वि.सं. """, "")
+           
+            browser.close()
             return date
 
     
