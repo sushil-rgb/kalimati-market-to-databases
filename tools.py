@@ -30,13 +30,16 @@ class KalimatiMarket:
         
         # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:
         # opt = Options()
+        
+        CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
+        GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN', '/usr/bin/google-chrome')
         opt = Options()
-        opt.binary_location = os.environ.get("GOOGLE_CHROME_BIN")        
+        opt.binary_location = GOOGLE_CHROME_BIN       
         opt.add_argument('--headless')
         opt.add_argument('--disable-gpu')
         opt.add_argument('--no-sandbox')
         opt.add_argument("--disable-dev-sh-usage")
-        self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=opt)
+        self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=opt)
         
         # path = Service("c:\\users\\chromedriver.exe")
         # arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
