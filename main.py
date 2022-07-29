@@ -3,7 +3,7 @@ import time
 import sqlite3
 
 
-print(f"-------------------------------------------------------\nWelcome to Kalimati market data scraper | The scraper is powered by Playwright.")
+print(f"--------------------------------------------------------------------------------\nWelcome to Kalimati market data scraper. | The scraper is powered by Playwright.")
 
 kalimati_market = KalimatiMarket()
 
@@ -22,8 +22,7 @@ try:
     conn.close()
     print(f"Today's date: {today_date}")
     time.sleep(2)
-    print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------")
+    print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------------------------------")
 except sqlite3.OperationalError:
     print(f"No data available. Please try again tomorrow.")
 
-    
