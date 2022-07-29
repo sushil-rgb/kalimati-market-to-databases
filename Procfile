@@ -1,1 +1,1 @@
-web: python api-kmarket:app 
+web: python api-kmarket.py
