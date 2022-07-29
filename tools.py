@@ -30,18 +30,21 @@ class KalimatiMarket:
         
         # Setting up the selenium driver. The Kalimati website is heavily rendered with Javascripts so browser automation is the way:
         # opt = Options()
-        opt = Options()
-        self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=opt)
+        opt = webdriver.ChromeOptions()
+        opt.binary_location = os.environ.get("GOOGLE_CHROME_BIN")        
         opt.add_argument('--headless')
-        opt.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        opt.add_argument('--no-sandbox')
+        opt.add_argument("--disable-dev-sh-usage")
+        self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=opt)
+        
         # path = Service("c:\\users\\chromedriver.exe")
-        arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
-              '--disable-dev-shm-usage']
-        # opt.headless = True
-        opt.add_experimental_option('excludeSwitches', ['enable-logging'])
-
-        for arg in arguments:
-            opt.add_argument(arg)
+        # arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
+        #       '--disable-dev-shm-usage']
+        # # opt.headless = True
+        # opt.add_experimental_option('excludeSwitches', ['enable-logging'])
+# 
+        # for arg in arguments:
+        #     opt.add_argument(arg)
              
 # 
         # self.driver = webdriver.Chrome(service=path, options=opt)        
@@ -61,7 +64,7 @@ class KalimatiMarket:
         soup = BeautifulSoup(content, 'lxml')
         
         date = soup.find('h4', class_='bottom-head').text.strip().replace("""दैनिक मूल्य बारे जानकारी
-- वि.सं. """, "")
+                                                                          - वि.सं. """, "")
         return date
 
 
