@@ -11,7 +11,7 @@ import random
 import os
 import itertools
 import time
-
+import sys
 
 class UserAgent:
     def get(self):
@@ -75,11 +75,17 @@ class KalimatiMarket:
         content = self.driver.page_source
         soup = BeautifulSoup(content, 'lxml')
         commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
+        
         # The below method is List comprehension method from Python. It save lots of lines of code. Ideally you can use conventional 'for' loop and store the value in lists.
-        # market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
-        market_lists = [[tab.find_all('td')[0].text.strip() for tab in commodity_table] for i in range(0, 5)]
+        try:
+            market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
+        except IndexError:
+            print("No data available try again tomorrow!")
+            market_lists = ["No data available! Try again tomorrow"] * 5
+            
         # Below lists will store all the scraped datas in tuple for databases:
         lists_of_markets = list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3], market_lists[4]))
         
         return market_lists
+
 

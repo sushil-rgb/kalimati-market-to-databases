@@ -24,15 +24,20 @@ def main_page():
 
 @app.get("/kalimati_market")
 def market_today():
-    return {date: {
-        "वस्तु": kalimati[0],
-        "एकाइ": kalimati[1],
-        "न्यूनतम": kalimati[2],
-        "अधिकतम": kalimati[3],
-        "औसत": kalimati[4]
+    try:
+        return {date: {
+            "वस्तु": kalimati[0],
+            "एकाइ": kalimati[1],
+            "न्यूनतम": kalimati[2],
+            "अधिकतम": kalimati[3],
+            "औसत": kalimati[4]
 
+        }
+        
+    
     }
-    }
+    except IndexError:
+        return "No data available try again tomorrow!"
 
 
 @app.get("/kalimati_market/commodity")
