@@ -1,1 +1,1 @@
-web: uvicorn api-kmarket:app
+web: uvicorn main:app

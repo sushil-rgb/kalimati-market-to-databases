@@ -1,29 +1,72 @@
-from tools import UserAgent, KalimatiMarket
-import time
-import sqlite3
+from fastapi import FastAPI
+from fastapi.exceptions import HTTPException
+from tools import KalimatiMarket
 
 
-print(f"-------------------------------------------------------\nWelcome to Kalimati market data scraper:")
-
-kalimati_market_url = "https://kalimatimarket.gov.np/price"
-kalimati_market = KalimatiMarket(kalimati_market_url)
-
-today_date = kalimati_market.daily_date()
-daily_date = today_date.replace(",", "").split() # here we first replace the comma and split it to give a table name
-table_name = '_'.join(daily_date)
-print(f"Today's date: {today_date}")
-time.sleep(1)
-
-# Make sqlite3 connection:
-conn = sqlite3.connect("Kmarket daily database.db")
-curr = conn.cursor()
-
-curr.execute(f"CREATE TABLE IF NOT EXISTS {table_name}(कृषि_उपज TEXT, ईकाइ TEXT, न्यूनतम TEXT, अधिकतम TEXT, औसत TEXT)")
-
-curr.executemany(f"INSERT INTO {table_name} VALUES(?, ?, ?, ?, ?)", kalimati_market.scrape())
-conn.commit()
-conn.close()
-
-print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------")
+app = FastAPI()
+date = KalimatiMarket().daily_date()
+kalimati = KalimatiMarket().scrape()
 
 
+@app.get("/")
+def main_page():
+    return {'api-endpoints':[
+                            "/kalimati_market",                            
+                            "/kalimati_market/commodity",
+                            "/kalimati_market/unit",
+                            "/kalimati_market/minimum",
+                            "/kalimati_market/maximum",
+                            "/kalimati_market/average",
+                            
+        ]
+        }
+
+
+@app.get("/kalimati_market")
+def market_today():
+    return {date: {
+        "वस्तु": kalimati[0],
+        "एकाइ": kalimati[1],
+        "न्यूनतम": kalimati[2],
+        "अधिकतम": kalimati[3],
+        "औसत": kalimati[4]
+
+    }
+    }
+
+
+@app.get("/kalimati_market/commodity")
+def commodity():
+    return {date:{
+            "वस्तु": kalimati[0]}}
+         
+        
+
+
+@app.get("/kalimati_market/unit")
+def unit():
+    return {date:{
+            "एकाइ": kalimati[1]}}     
+        
+
+
+@app.get("/kalimati_market/minimum")
+def minimum():
+    return {date:{
+            "न्यूनतम": kalimati[2]}}    
+        
+
+
+@app.get("/kalimati_market/maximum")
+def maximum():
+    return {date:{
+            "अधिकतम": kalimati[3]}}    
+        
+
+
+@app.get("/kalimati_market/average")
+def average():
+    return {date:{
+            "औसत": kalimati[4]}}
+    
+        
