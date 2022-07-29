@@ -1,1 +1,1 @@
-web: python api-kmarket.py
+web: gunicorn api-kmarket:app
