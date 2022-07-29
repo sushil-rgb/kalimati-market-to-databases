@@ -1,1 +1,1 @@
-worker: python api-kmarket.py
+web: python api-kmarket.py
