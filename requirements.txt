@@ -3,5 +3,6 @@ beautifulsoup4
 lxml
 pandas
 openpyxl
-playwright
+fastapi
+uvicorn
 selenium
