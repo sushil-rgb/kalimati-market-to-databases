@@ -3,7 +3,7 @@ Scrape data from the Kalimati market website and stores in sqlite3 database. The
 
 # Instructions
 • Clone the repository.           
-• Install the neccessary modules from   terminal command.
+• Install the neccessary modules from terminal command.
 
 # Terminal command:                    
 • pip install -r requirements.txt                                                                                                                               
