@@ -1,1 +1,1 @@
-web: uvicorn api-kmarket:app --workers 4
+web: uvicorn api-kmarket:app 
