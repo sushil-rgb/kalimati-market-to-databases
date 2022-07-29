@@ -1,5 +1,5 @@
 # kalimati-market-to-databases
-Scrape data from the Kalimati market website and stores in sqlite3 database. The script runs on this awesome Playwright automation..
+Scrape data from the Kalimati market website and stores in sqlite3 database. The script runs on this awesome Playwright automation.
 
 # Instructions
 • Clone the repository
