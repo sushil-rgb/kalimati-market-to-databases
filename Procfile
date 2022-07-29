@@ -1,1 +1,1 @@
-web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker api-kmarket:app
+web: uvicorn api-kmarket:app --workers 4

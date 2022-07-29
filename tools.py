@@ -33,6 +33,7 @@ class KalimatiMarket:
         opt = webdriver.ChromeOptions()
         opt.binary_location = os.environ.get("GOOGLE_CHROME_BIN")        
         opt.add_argument('--headless')
+        opt.add_argument('--disable-gpu')
         opt.add_argument('--no-sandbox')
         opt.add_argument("--disable-dev-sh-usage")
         self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=opt)
