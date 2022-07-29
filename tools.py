@@ -35,13 +35,14 @@ class KalimatiMarket:
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
         self.driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         # path = Service("c:\\users\\chromedriver.exe")
-        # arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
-        #      '--disable-dev-shm-usage']
+        arguments = ['--no-sandbox', 'start-maximized', "disable-infobars", "--disable-extensions","--disable-gpu",
+              '--disable-dev-shm-usage']
         # opt.headless = True
-        # opt.add_experimental_option('excludeSwitches', ['enable-logging'])
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-        # for arg in arguments:
-        #     opt.add_argument(arg)
+        for arg in arguments:
+            chrome_options.add_argument(arg)
+             
 # 
         # self.driver = webdriver.Chrome(service=path, options=opt)        
         
