@@ -1,6 +1,12 @@
 from tools import UserAgent, KalimatiMarket
 import time
 import sqlite3
+import logging
+
+
+# This will log our each requests and record the time and error whenever the script fails so it would be easy to debug later:
+logging.basicConfig(filename='kMarket.log', level=logging.DEBUG, 
+                    format='%(asctime)s - %(message)s', datefmt=f"%d-%b-%y %H:%M:%S")
 
 
 print(f"--------------------------------------------------------------------------------\nWelcome to Kalimati market data scraper. | The scraper is powered by Playwright.")
@@ -16,13 +22,13 @@ conn = sqlite3.connect("Kmarket daily database.db")
 curr = conn.cursor()
 
 try:    
-    curr.execute(f"CREATE TABLE IF NOT EXISTS {table_name}(कृषि_उपज TEXT, ईकाइ TEXT, न्यूनतम TEXT, अधिकतम TEXT, औसत TEXT)")
-    curr.executemany(f"INSERT INTO {table_name} VALUES(?, ?, ?, ?, ?)", kalimati_market.scrape())
+    curr.execute(f"CREATE TABLE IF NOT EXISTS {table_name}(कृषि_उपज TEXT, न्यूनतम TEXT, अधिकतम TEXT, औसत TEXT)")
+    curr.executemany(f"INSERT INTO {table_name} VALUES(?, ?, ?, ?)", kalimati_market.scrape())
     conn.commit()
     conn.close()
-    print(f"Today's date: {today_date}")
+    print(f"Latest update: {today_date}")
     time.sleep(2)
     print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------------------------------")
 except sqlite3.OperationalError:
-    print(f"No data available. Please try again tomorrow.")
+    print(f"Oops! There's a problem. It seems there are no datas available. Please try again later or tomorrow.")
 

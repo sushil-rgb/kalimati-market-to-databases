@@ -16,7 +16,7 @@ class UserAgent:
 
 class KalimatiMarket:
     def __init__(self):        
-        self.website_url = "https://kalimatimarket.gov.np/price" 
+        self.website_url = "https://kalimatimarket.gov.np/" 
         self.req = requests.get(self.website_url, headers={"User-Agent": UserAgent().get()})         
                 
     
@@ -30,15 +30,15 @@ class KalimatiMarket:
             page = browser.new_page(user_agent=UserAgent().get())            
             page.goto(self.website_url)
         
-            date_xpath_selector = "//h4[@class='bottom-head']"
+            date_xpath_selector = "//h5[@style='padding-top:0;color:#006400']"
             page.wait_for_selector(date_xpath_selector, timeout=1*10000)
 
             content = page.content()
             soup = BeautifulSoup(content, 'lxml')
-            date = soup.find('h4', class_='bottom-head').text.strip().replace("""दैनिक मूल्य बारे जानकारी
-                                                                              - वि.सं. """, "")
-           
+            date = soup.find('div', class_='features-inner even bg-white').find('h5').text.strip().replace("दैनिक मूल्यहरु - वि.सं. ", "")                  
+
             browser.close()
+
             return date
 
     
@@ -50,20 +50,20 @@ class KalimatiMarket:
             page.goto(self.website_url)
             
             # Xpath selector:
-            table_xpath = "//table[@id='commodityPriceParticular']"
+            table_xpath = "//table[@id='commodityDailyPrice']"
             page.wait_for_selector(table_xpath, timeout=1*10000)
 
             content = page.content()
             soup = BeautifulSoup(content, 'lxml')
 
-            commodity_table = soup.find('table', id='commodityPriceParticular').find('tbody')
-            
+            commodity_table = soup.find('table', id='commodityDailyPrice').find('tbody')
             try:
-                market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 5)]
+              market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 4)]
             except IndexError:
-                print("No data available! Try again tomorrow.")
-                market_lists = ["No data available! Try again tomorrow."] * 5
-
+              print("No data available! Try again tomorrow.")
+              market_lists = ["No data available! Try again tomorrow."] * 5            
+            
             browser.close()
-            return market_lists
 
+            return list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3]))
+            
