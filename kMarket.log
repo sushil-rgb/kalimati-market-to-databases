@@ -1,0 +1,4 @@
+30-Jul-22 15:44:54 - Starting new HTTPS connection (1): kalimatimarket.gov.np:443
+30-Jul-22 15:44:55 - https://kalimatimarket.gov.np:443 "GET / HTTP/1.1" 200 None
+30-Jul-22 15:44:55 - Using proactor: IocpProactor
+30-Jul-22 15:45:07 - Using proactor: IocpProactor
