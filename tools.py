@@ -4,6 +4,11 @@ import requests
 import random
 import itertools
 import time
+import datetime
+import re
+
+
+time_now = datetime.datetime.now().strftime("%Y-%m-%d")
 
 
 class UserAgent:
@@ -35,7 +40,7 @@ class KalimatiMarket:
 
             content = page.content()
             soup = BeautifulSoup(content, 'lxml')
-            date = soup.find('div', class_='features-inner even bg-white').find('h5').text.strip().replace("दैनिक मूल्यहरु - वि.सं. ", "")                  
+            date = soup.find('div', class_='features-inner even bg-white').find('h5').text.strip()                 
 
             browser.close()
 
@@ -57,13 +62,31 @@ class KalimatiMarket:
             soup = BeautifulSoup(content, 'lxml')
 
             commodity_table = soup.find('table', id='commodityDailyPrice').find('tbody')
+
+            # Extracting all the market values by looping in list compreheinsion method:
             try:
               market_lists = [[tab.find_all('td')[i].text.strip() for tab in commodity_table] for i in range(0, 4)]
             except IndexError:
               print("No data available! Try again tomorrow.")
               market_lists = ["No data available! Try again tomorrow."] * 5            
             
+            # Datetime of extraction in a lists:
+            date_lists = [time_now] * len(market_lists[0]) 
+
+            units = []
+            commodities = []
+
+            # Extracting only unit from commodity for separate column:
+            for commodity in market_lists[0]:
+                # splitting the string with special brackets and filtering out the commodity and unit values separately:
+                split_strings = re.split(r"[()]", commodity)
+                fresh_commos = " ".join(split_strings[:-2])
+
+                commodities.append(fresh_commos)               # Fresh commodities
+                units.append(split_strings[-2])             # Fresh units
+           
             browser.close()
 
-            return list(zip(market_lists[0], market_lists[1], market_lists[2], market_lists[3]))
+            # Zipping all the scraped datas in tuple for MYSQL database.
+            return list(zip(date_lists, commodities, units, market_lists[1], market_lists[2], market_lists[3]))
             

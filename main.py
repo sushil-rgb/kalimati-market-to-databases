@@ -1,7 +1,7 @@
 from tools import UserAgent, KalimatiMarket
-import time
-import sqlite3
+import mysql.connector
 import logging
+
 
 
 # This will log our each requests and record the time and error whenever the script fails so it would be easy to debug later:
@@ -9,26 +9,38 @@ logging.basicConfig(filename='kMarket.log', level=logging.DEBUG,
                     format='%(asctime)s - %(message)s', datefmt=f"%d-%b-%y %H:%M:%S")
 
 
+# Making a MYSQL connection:
+mydb = mysql.connector.connect(
+                host = 'localhost',
+                user = 'root',
+                password = '',
+                database = 'kalimati_daily_market' # first create a datbase in MYSQL then run the script.
+    )
+cursor = mydb.cursor()
+
+# First create a database name by using below queries:
+# cursor.execute("CREATE DATABASE kalimati_daily_market")
+
 print(f"--------------------------------------------------------------------------------\nWelcome to Kalimati market data scraper. | The scraper is powered by Playwright.")
+
 
 kalimati_market = KalimatiMarket()
 
 today_date = kalimati_market.daily_date()
-daily_date = today_date.replace(",", "").split() # here we first replace the comma and split it to give a table name
-table_name = '_'.join(daily_date)
 
-# Make sqlite3 connection:
-conn = sqlite3.connect("Kmarket daily database.db")
-curr = conn.cursor()
 
-try:    
-    curr.execute(f"CREATE TABLE IF NOT EXISTS {table_name}(कृषि_उपज TEXT, न्यूनतम TEXT, अधिकतम TEXT, औसत TEXT)")
-    curr.executemany(f"INSERT INTO {table_name} VALUES(?, ?, ?, ?)", kalimati_market.scrape())
-    conn.commit()
-    conn.close()
-    print(f"Latest update: {today_date}")
-    time.sleep(2)
-    print(f"Kalimati Market database is saved. Date | {today_date}\n-------------------------------------------------------------------------------")
-except sqlite3.OperationalError:
-    print(f"Oops! There's a problem. It seems there are no datas available. Please try again later or tomorrow.")
+cursor.execute(f"DROP TABLE IF EXISTS `{today_date}`")
+table_name = f"CREATE TABLE `{today_date}` (Date VARCHAR(50), Commodity VARCHAR(50), Units VARCHAR(50), Minimum VARCHAR(50), Maximum VARCHAR(50), Average VARCHAR(50))"
+cursor.execute(table_name)
+
+s = f"INSERT INTO `{today_date}` VALUES(%s, %s, %s, %s, %s, %s)"
+cursor.executemany(s, kalimati_market.scrape())
+mydb.commit()
+mydb.close()
+print(f"Database is saved!")
+
+
+
+
+
 
