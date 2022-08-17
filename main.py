@@ -3,7 +3,6 @@ import mysql.connector
 import logging
 
 
-
 # This will log our each requests and record the time and error whenever the script fails so it would be easy to debug later:
 logging.basicConfig(filename='kMarket.log', level=logging.DEBUG, 
                     format='%(asctime)s - %(message)s', datefmt=f"%d-%b-%y %H:%M:%S")
@@ -40,10 +39,4 @@ try:
   print(f"Database is saved!")
 except mysql.connector.errors.ProgrammingError:
     print("No new data available. Try again tomorrow.")
-
-
-
-
-
-
 
