@@ -29,15 +29,18 @@ kalimati_market = KalimatiMarket()
 today_date = kalimati_market.daily_date()
 
 
-cursor.execute(f"DROP TABLE IF EXISTS `{today_date}`")
-table_name = f"CREATE TABLE `{today_date}` (Date VARCHAR(50), Commodity VARCHAR(50), Units VARCHAR(50), Minimum VARCHAR(50), Maximum VARCHAR(50), Average VARCHAR(50))"
-cursor.execute(table_name)
+try:
+  table_name = f"CREATE TABLE `{today_date}` (Date VARCHAR(50), Commodity VARCHAR(50), Units VARCHAR(50), Minimum VARCHAR(50), Maximum VARCHAR(50), Average VARCHAR(50))"
+  cursor.execute(table_name)
 
-s = f"INSERT INTO `{today_date}` VALUES(%s, %s, %s, %s, %s, %s)"
-cursor.executemany(s, kalimati_market.scrape())
-mydb.commit()
-mydb.close()
-print(f"Database is saved!")
+  s = f"INSERT INTO `{today_date}` VALUES(%s, %s, %s, %s, %s, %s)"
+  cursor.executemany(s, kalimati_market.scrape())
+  mydb.commit()
+  mydb.close()
+  print(f"Database is saved!")
+except mysql.connector.errors.ProgrammingError:
+    print("No new data available. Try again tomorrow.")
+
 
 
 
